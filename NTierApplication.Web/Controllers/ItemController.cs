@@ -15,7 +15,7 @@ namespace NTierApplication.Web.Controllers
         {
             ItemService = itemService;
         }
-
+        //fork qilishni urganyapman
         [HttpGet]
         [Route("")]
         [SwaggerOperation(OperationId = "GetAll")]
