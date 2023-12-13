@@ -38,5 +38,19 @@ namespace NTierApplication.Web.Controllers
         {
             return ItemService.GetById(id);
         }
+
+        [HttpPut]
+        public ItemViewModel Update(ItemViewModel itemViewModel)
+        {
+            ItemService.Update(itemViewModel);
+            return itemViewModel;
+        }
+
+        [HttpDelete]
+        [Route("{id}")]
+        public void Delete(long id)
+        {
+            ItemService.Delete(id);
+        }
     }
 }
