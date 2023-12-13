@@ -1,4 +1,5 @@
-﻿using NTierApplication.DataAccess.Models;
+﻿using Microsoft.EntityFrameworkCore;
+using NTierApplication.DataAccess.Models;
 using NTierApplication.Errors;
 using NTierApplication.Repository;
 using NTierApplication.Service.ViewModels;
@@ -12,7 +13,7 @@ namespace NTierApplication.Service
 {
     public class ItemService : IItemService
     {
-        private IItemRepository ItemRepository;
+        private readonly IItemRepository ItemRepository;
 
         public ItemService(IItemRepository itemRepository)
         {
@@ -45,9 +46,15 @@ namespace NTierApplication.Service
             item.ItemId = entity.ItemId;
         }
 
-        public void Delete(long itemId)
+        public void Delete(long id)
         {
-            throw new NotImplementedException();
+            var result = ItemRepository.GetAll().Where(x => x.ItemId == id).FirstOrDefault();
+            if (result == null)
+            {
+                throw new ArgumentNullException(nameof(Item));
+            }
+            ItemRepository.Delete(result);
+            ItemRepository.SaveChanges();
         }
 
         public ItemViewModel GetById(long id)
@@ -84,7 +91,24 @@ namespace NTierApplication.Service
 
         public void Update(ItemViewModel item)
         {
-            throw new NotImplementedException();
+            if (item == null)
+            {
+                throw new ArgumentNullException(nameof(item));
+            }
+
+            var result = ItemRepository.GetAll().Where(x => x.ItemId == item.ItemId).FirstOrDefault();
+
+            if (result == null)
+            {
+                throw new EntryNotFoundException("No such item");
+            }
+
+            result.ItemDate = item.ItemDate;
+            result.ItemName = item.ItemName;
+            result.ItemType = item.ItemType;
+
+            ItemRepository.Update(result);
+            ItemRepository.SaveChanges();
         }
     }
 }
