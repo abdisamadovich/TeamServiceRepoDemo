@@ -12,6 +12,7 @@ namespace NTierApplication.DataAccess
     public class MainContext : DbContext
     {
         public DbSet<Item> Items { get; set; }
+        public DbSet<User> Users { get; set; }
 
         public MainContext(DbContextOptions<MainContext> options)
             : base(options)
