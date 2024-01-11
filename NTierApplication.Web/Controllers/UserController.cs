@@ -23,12 +23,13 @@ namespace NTierApplication.Web.Controllers
             return UserService.GetUsers();
         }
 
-        [HttpPost(Name = "CreateNew1")]
+        /*[HttpPost(Name = "CreateNew1")]
         public UserViewModel CreateNew(UserViewModel userViewModel)
         {
+            userViewModel.Password = BCrypt.Net.BCrypt.HashPassword(userViewModel.Password);
             UserService.CreateNew(userViewModel);
             return userViewModel;
-        }
+        }*/
 
         [HttpGet]
         [Route("{id}")]
@@ -37,7 +38,7 @@ namespace NTierApplication.Web.Controllers
             return UserService.GetById(id);
         }
 
-        [HttpPut]
+        /*[HttpPut]
         public UserViewModel Update(UserViewModel userViewModel)
         {
             UserService.Update(userViewModel);
@@ -49,6 +50,6 @@ namespace NTierApplication.Web.Controllers
         public void Delete(int id)
         {
             UserService.Delete(id);
-        }
+        }*/
     }
 }

@@ -1,10 +1,15 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using NTierApplication.DataAccess;
+using NTierApplication.DataAccess.Models;
 using NTierApplication.Repository;
 using NTierApplication.Service;
 using NTierApplication.Web.ActionHelpers;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
+
 
 // Add services to the container.
 

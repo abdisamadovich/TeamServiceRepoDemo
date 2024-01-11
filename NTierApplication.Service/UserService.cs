@@ -33,7 +33,7 @@ public class UserService : IUserService
         }
         if (string.IsNullOrWhiteSpace(user.Email))
         {
-            throw new ParameterInvalidException("Password cannot be empty");
+            throw new ParameterInvalidException("Email cannot be empty");
         }
 
         var entity = new User
@@ -91,6 +91,13 @@ public class UserService : IUserService
             Password = x.Password,
             Email = x.Email
         }).ToList();
+    }
+
+    public List<User> Login(LoginViewModel loginViewModel)
+    {
+        var users = UserRepository.GetAll();
+
+        return users.Where(x => x.Email == loginViewModel.Email).ToList();
     }
 
     public void Update(UserViewModel user)
