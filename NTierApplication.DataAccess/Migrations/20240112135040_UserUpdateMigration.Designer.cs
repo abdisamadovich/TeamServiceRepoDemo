@@ -12,8 +12,8 @@ using NTierApplication.DataAccess;
 namespace NTierApplication.DataAccess.Migrations
 {
     [DbContext(typeof(MainContext))]
-    [Migration("20240111212309_UserCreate")]
-    partial class UserCreate
+    [Migration("20240112135040_UserUpdateMigration")]
+    partial class UserUpdateMigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -65,6 +65,9 @@ namespace NTierApplication.DataAccess.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Password")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Salt")
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");

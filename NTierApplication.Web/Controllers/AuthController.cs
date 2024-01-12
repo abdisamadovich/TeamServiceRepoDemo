@@ -8,7 +8,7 @@ namespace NTierApplication.Web.Controllers;
 [ApiController]
 public class AuthController : ControllerBase
 {
-    private readonly IUserService UserService;
+    /*private readonly IUserService UserService;
 
     public AuthController(IUserService userService)
     {
@@ -41,5 +41,5 @@ public class AuthController : ControllerBase
             return Ok(loginViewModel);
 
         return BadRequest();
-    }
+    }*/
 }

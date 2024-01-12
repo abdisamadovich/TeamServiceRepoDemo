@@ -5,10 +5,10 @@ namespace NTierApplication.Service;
 
 public interface IUserService
 {
-    void CreateNew(UserViewModel user);
+    public (bool Result, string Token) Register(UserViewModel userViewModel);
     void Update(UserViewModel user);
     void Delete(int id);
     ICollection<UserViewModel> GetUsers();
     UserViewModel GetById(int id);
-    List<User> Login(LoginViewModel loginViewModel);
+    public (bool Result, string Token) Login(LoginViewModel loginViewModel);
 }
