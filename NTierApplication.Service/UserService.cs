@@ -1,19 +1,23 @@
-﻿using NTierApplication.DataAccess.Models;
+﻿using Microsoft.AspNetCore.Identity;
+using NTierApplication.DataAccess.Models;
 using NTierApplication.Errors;
 using NTierApplication.Repository;
+using NTierApplication.Service.Helpers;
 using NTierApplication.Service.ViewModels;
 
 namespace NTierApplication.Service;
 
 public class UserService : IUserService
 {
-    private readonly IUserRepository UserRepository;
+    private IUserRepository _repository;
+    private ITokenService _tokenSerivce;
 
-    public UserService(IUserRepository userRepository)
+    public UserService(IUserRepository userRepository, ITokenService tokenService)
     {
-        UserRepository = userRepository;
+        _repository = userRepository;
+        _tokenSerivce = tokenService;
     }
-    public void CreateNew(UserViewModel user)
+    /*public void CreateNew(UserViewModel user)
     {
         if (user == null)
         {
@@ -43,25 +47,25 @@ public class UserService : IUserService
             Password = user.Password,
             Email = user.Email,
         };
-        UserRepository.Insert(entity);
-        UserRepository.SaveChanges();
+        _repository.Insert(entity);
+        _repository.SaveChanges();
         user.Id = entity.Id;
-    }
+    }*/
 
     public void Delete(int id)
     {
-        var result = UserRepository.GetAll().Where(x => x.Id == id).FirstOrDefault();
+        var result = _repository.GetAll().Where(x => x.Id == id).FirstOrDefault();
         if (result == null)
         {
             throw new ArgumentNullException(nameof(Item));
         }
-        UserRepository.Delete(result);
-        UserRepository.SaveChanges();
+        _repository.Delete(result);
+        _repository.SaveChanges();
     }
 
     public UserViewModel GetById(int id)
     {
-        var result = UserRepository.GetAll()
+        var result = _repository.GetAll()
                 .Select(x => new UserViewModel
                 {
                     Id = x.Id,
@@ -83,7 +87,7 @@ public class UserService : IUserService
 
     public ICollection<UserViewModel> GetUsers()
     {
-        return UserRepository.GetAll().Select(x => new UserViewModel
+        return _repository.GetAll().Select(x => new UserViewModel
         {
             Id = x.Id,
             FirstName = x.FirstName,
@@ -95,9 +99,45 @@ public class UserService : IUserService
 
     public List<User> Login(LoginViewModel loginViewModel)
     {
-        var users = UserRepository.GetAll();
+        var users = _repository.GetAll();
 
         return users.Where(x => x.Email == loginViewModel.Email).ToList();
+    }
+
+    public (bool Result, string Token) Register(UserViewModel userViewModel)
+    {
+        if (userViewModel == null)
+        {
+            throw new ArgumentNullException(nameof(userViewModel));
+        }
+        var userDatabase = _repository.GetAll().
+            Where(x => x.Email == userViewModel.Email).
+            FirstOrDefault();
+        if (userDatabase != null)
+        {
+            throw new ParameterInvalidException(nameof(userViewModel));
+        }
+
+        User user = new User
+        {
+            FirstName = userViewModel.FirstName,
+            LastName = userViewModel.LastName,
+            Email = userViewModel.Email,
+            Password = userViewModel.Password
+        };
+
+        _repository.Insert(user);
+        int result = _repository.SaveChanges();
+
+        if (result > 0)
+        {
+            string token = _tokenSerivce.GenerateToken(user);
+            return (Result: true, Token: token);
+        }
+        else
+        {
+            return (Result: false, Token: "");
+        }
     }
 
     public void Update(UserViewModel user)
@@ -107,7 +147,7 @@ public class UserService : IUserService
             throw new ArgumentNullException(nameof(user));
         }
 
-        var result = UserRepository.GetAll().Where(x => x.Id == user.Id).FirstOrDefault();
+        var result = _repository.GetAll().Where(x => x.Id == user.Id).FirstOrDefault();
 
         if (result == null)
         {
@@ -119,8 +159,35 @@ public class UserService : IUserService
         result.Password = user.Password;
         result.Email = user.Email;
 
-        UserRepository.Update(result);
-        UserRepository.SaveChanges();
+        _repository.Update(result);
+        _repository.SaveChanges();
+    }
+
+    (bool Result, string Token) IUserService.Login(LoginViewModel loginViewModel)
+    {
+        if (loginViewModel == null)
+        {
+            throw new ArgumentNullException(nameof(loginViewModel));
+        }
+        var userDatabase = _repository.GetAll().
+          Where(x => x.Email == loginViewModel.Email).
+          FirstOrDefault();
+        if (userDatabase == null)
+        {
+            throw new EntryNotFoundException(nameof(userDatabase));
+        }
+
+        var hasherResult = PasswordHasher.Verify(loginViewModel.Password, userDatabase.Password, userDatabase.Salt);
+        if (hasherResult == true)
+        {
+            string token = _tokenSerivce.GenerateToken(userDatabase);
+            return (Result: true, Token: token);
+        }
+        else
+        {
+            throw new ParameterInvalidException(nameof(loginViewModel));
+        }
+
     }
 }
 
