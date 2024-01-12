@@ -12,8 +12,8 @@ using NTierApplication.DataAccess;
 namespace NTierApplication.DataAccess.Migrations
 {
     [DbContext(typeof(MainContext))]
-    [Migration("20240111130858_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20240111212309_UserCreate")]
+    partial class UserCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

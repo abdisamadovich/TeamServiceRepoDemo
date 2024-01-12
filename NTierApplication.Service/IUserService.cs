@@ -1,4 +1,5 @@
-﻿using NTierApplication.Service.ViewModels;
+﻿using NTierApplication.DataAccess.Models;
+using NTierApplication.Service.ViewModels;
 
 namespace NTierApplication.Service;
 
@@ -9,4 +10,5 @@ public interface IUserService
     void Delete(int id);
     ICollection<UserViewModel> GetUsers();
     UserViewModel GetById(int id);
+    List<User> Login(LoginViewModel loginViewModel);
 }
