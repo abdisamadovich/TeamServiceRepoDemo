@@ -17,40 +17,6 @@ public class UserService : IUserService
         _repository = userRepository;
         _tokenSerivce = tokenService;
     }
-    /*public void CreateNew(UserViewModel user)
-    {
-        if (user == null)
-        {
-            throw new ArgumentNullException(nameof(user));
-        }
-        if (string.IsNullOrWhiteSpace(user.FirstName))
-        {
-            throw new ParameterInvalidException("FirstName cannot be empty");
-        }
-        if (string.IsNullOrWhiteSpace(user.LastName))
-        {
-            throw new ParameterInvalidException("LastName cannot be empty");
-        }
-        if (string.IsNullOrWhiteSpace(user.Password))
-        {
-            throw new ParameterInvalidException("Password cannot be empty");
-        }
-        if (string.IsNullOrWhiteSpace(user.Email))
-        {
-            throw new ParameterInvalidException("Email cannot be empty");
-        }
-
-        var entity = new User
-        {
-            FirstName = user.FirstName,
-            LastName = user.LastName,
-            Password = user.Password,
-            Email = user.Email,
-        };
-        _repository.Insert(entity);
-        _repository.SaveChanges();
-        user.Id = entity.Id;
-    }*/
 
     public void Delete(int id)
     {
@@ -63,18 +29,17 @@ public class UserService : IUserService
         _repository.SaveChanges();
     }
 
-    public UserViewModel GetById(int id)
+    public UserViewModel GetById(string email)
     {
         var result = _repository.GetAll()
                 .Select(x => new UserViewModel
                 {
-                    Id = x.Id,
                     FirstName = x.FirstName,
                     LastName = x.LastName,
                     Password = x.Password,
                     Email = x.Email,
                 })
-                .FirstOrDefault(x => x.Id == id);
+                .FirstOrDefault(x => x.Email == email);
 
         if (result == null)
         {
@@ -89,19 +54,11 @@ public class UserService : IUserService
     {
         return _repository.GetAll().Select(x => new UserViewModel
         {
-            Id = x.Id,
             FirstName = x.FirstName,
             LastName = x.LastName,
             Password = x.Password,
             Email = x.Email
         }).ToList();
-    }
-
-    public List<User> Login(LoginViewModel loginViewModel)
-    {
-        var users = _repository.GetAll();
-
-        return users.Where(x => x.Email == loginViewModel.Email).ToList();
     }
 
     public (bool Result, string Token) Register(UserViewModel userViewModel)
@@ -115,15 +72,17 @@ public class UserService : IUserService
             FirstOrDefault();
         if (userDatabase != null)
         {
-            throw new ParameterInvalidException(nameof(userViewModel));
+            throw new ParameterInvalidException("Bu email oldin ruyxatdan o'tgan.Itimos boshqa email bilan ruyxatdan o'ting!");
         }
 
+        var passwordHash = PasswordHasher.Hasher(userViewModel.Password);
         User user = new User
         {
             FirstName = userViewModel.FirstName,
             LastName = userViewModel.LastName,
             Email = userViewModel.Email,
-            Password = userViewModel.Password
+            Password = passwordHash.Hash,
+            Salt = passwordHash.Salt,
         };
 
         _repository.Insert(user);
@@ -147,7 +106,7 @@ public class UserService : IUserService
             throw new ArgumentNullException(nameof(user));
         }
 
-        var result = _repository.GetAll().Where(x => x.Id == user.Id).FirstOrDefault();
+        var result = _repository.GetAll().Where(x => x.Email == user.Email).FirstOrDefault();
 
         if (result == null)
         {
@@ -174,7 +133,7 @@ public class UserService : IUserService
           FirstOrDefault();
         if (userDatabase == null)
         {
-            throw new EntryNotFoundException(nameof(userDatabase));
+            throw new EntryNotFoundException("Bu email bilan ruyxatdan o'tgan foydalanuvchi topilmadi!");
         }
 
         var hasherResult = PasswordHasher.Verify(loginViewModel.Password, userDatabase.Password, userDatabase.Salt);
@@ -185,7 +144,7 @@ public class UserService : IUserService
         }
         else
         {
-            throw new ParameterInvalidException(nameof(loginViewModel));
+            throw new ParameterInvalidException("Bu email ga tegishli parol notug'ri kiritildi!");
         }
 
     }
