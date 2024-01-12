@@ -8,38 +8,22 @@ namespace NTierApplication.Web.Controllers;
 [ApiController]
 public class AuthController : ControllerBase
 {
-    /*private readonly IUserService UserService;
+    private IUserService _service;
 
     public AuthController(IUserService userService)
     {
-        UserService = userService;
+        _service = userService;
     }
-
     [HttpPost("register")]
-    public UserViewModel CreateNew(UserViewModel userViewModel)
+    public IActionResult Register(UserViewModel userViewModel)
     {
-        userViewModel.Password = BCrypt.Net.BCrypt.HashPassword(userViewModel.Password);
-        UserService.CreateNew(userViewModel);
-        return userViewModel;
+        var result = _service.Register(userViewModel);
+        return Ok(new { result.Result, result.Token });
     }
-
     [HttpPost("login")]
-    public IActionResult LogIn(LoginViewModel loginViewModel)
+    public IActionResult Login(LoginViewModel loginViewModel)
     {
-        var res = UserService.Login(loginViewModel);
-
-        bool check = false;
-
-        foreach (var user in res)
-        {
-            if (BCrypt.Net.BCrypt.Verify(loginViewModel.Password, user.Password))
-                check = true;
-        }
-
-
-        if (check)
-            return Ok(loginViewModel);
-
-        return BadRequest();
-    }*/
+        var result = _service.Login(loginViewModel);
+        return Ok(new { result.Result, result.Token });
+    }
 }

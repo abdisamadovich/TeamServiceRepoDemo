@@ -33,7 +33,7 @@ namespace NTierApplication.Web.Controllers
 
         [HttpGet]
         [Route("{id}")]
-        public UserViewModel GetById(int id)
+        public UserViewModel GetById(string id)
         {
             return UserService.GetById(id);
         }
