@@ -48,7 +48,6 @@ namespace NTierApplication.Web.Controllers
         }
 
         [HttpDelete]
-        [Route("{id}")]
         public void Delete(long id)
         {
             ItemService.Delete(id);
