@@ -103,7 +103,7 @@ namespace NTierApplication.Service
             ItemGetAllViewModel itemGetAllView = new ItemGetAllViewModel
             {
                 Items = itemView,
-                PaginataionMetaData = paginationMeta
+                PaginationMetaData = paginationMeta
             };
             return itemGetAllView;
         }
