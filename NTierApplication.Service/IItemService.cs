@@ -1,4 +1,5 @@
-﻿using NTierApplication.Service.ViewModels;
+﻿using NTierApplication.DataAccess.Utils;
+using NTierApplication.Service.ViewModels;
 
 namespace NTierApplication.Service
 {
@@ -7,7 +8,7 @@ namespace NTierApplication.Service
         void CreateNew(ItemViewModel item);
         void Update(ItemViewModel item);
         void Delete(long itemId);
-        ICollection<ItemViewModel> GetItems();
         ItemViewModel GetById(long id);
+        ItemGetAllViewModel GetItems(PaginationParams @params);
     }
 }

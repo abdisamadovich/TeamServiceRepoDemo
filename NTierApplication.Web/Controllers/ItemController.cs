@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using NTierApplication.DataAccess.Utils;
 using NTierApplication.Service;
 using NTierApplication.Service.ViewModels;
 using Swashbuckle.AspNetCore.Annotations;
@@ -19,9 +20,9 @@ namespace NTierApplication.Web.Controllers
         [HttpGet]
         [Route("")]
         [SwaggerOperation(OperationId = "GetAll")]
-        public ICollection<ItemViewModel> GetAll()
+        public ItemGetAllViewModel GetAll(int page = 1, int pageSize = 10)
         {
-            return ItemService.GetItems();
+            return ItemService.GetItems(new PaginationParams(page, pageSize));
         }
 
         [HttpPost(Name = "CreateNew")]
