@@ -1,7 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using NTierApplication.DataAccess.Models;
+using NTierApplication.DataAccess.Utils;
 using NTierApplication.Errors;
 using NTierApplication.Repository;
+using NTierApplication.Service.Common.Interface;
 using NTierApplication.Service.ViewModels;
 using System;
 using System.Collections.Generic;
@@ -14,10 +16,12 @@ namespace NTierApplication.Service
     public class ItemService : IItemService
     {
         private readonly IItemRepository ItemRepository;
+        private readonly IPaginator _paginator;
 
-        public ItemService(IItemRepository itemRepository)
+        public ItemService(IItemRepository itemRepository, IPaginator paginator)
         {
             ItemRepository = itemRepository;
+            this._paginator = paginator;
         }
 
         public void CreateNew(ItemViewModel item)
@@ -78,15 +82,30 @@ namespace NTierApplication.Service
             //.FirstOrDefault();
         }
 
-        public ICollection<ItemViewModel> GetItems()
+        public ItemGetAllViewModel GetItems(PaginationParams @params)
         {
-            return ItemRepository.GetAll().Select(x => new ItemViewModel
+            var items = ItemRepository.GetAll()
+            .Skip(@params.GetSkipCount())
+            .Take(@params.PageSize)
+            .ToList();
+            long itemCount = ItemRepository.GetAll().Count();
+
+            PaginationMetaData paginationMeta = _paginator.Paginate(itemCount, @params);
+
+            var itemView = items.Select(x => new ItemViewModel
             {
                 ItemId = x.ItemId,
                 ItemDate = x.ItemDate,
                 ItemName = x.ItemName,
                 ItemType = x.ItemType
             }).ToList();
+
+            ItemGetAllViewModel itemGetAllView = new ItemGetAllViewModel
+            {
+                Items = itemView,
+                PaginataionMetaData = paginationMeta
+            };
+            return itemGetAllView;
         }
 
         public void Update(ItemViewModel item)

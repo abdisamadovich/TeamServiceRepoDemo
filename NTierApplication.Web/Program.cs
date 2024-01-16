@@ -5,6 +5,8 @@ using NTierApplication.DataAccess;
 using NTierApplication.DataAccess.Models;
 using NTierApplication.Repository;
 using NTierApplication.Service;
+using NTierApplication.Service.Common.Interface;
+using NTierApplication.Service.Common.Service;
 using NTierApplication.Service.Helpers;
 using NTierApplication.Web.ActionHelpers;
 using System.Text;
@@ -18,12 +20,15 @@ builder.Services.AddControllers(options => options.Filters.Add<ApiExceptionFilte
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddMemoryCache();
 
 builder.Services.AddTransient<IItemService, ItemService>();
 builder.Services.AddTransient<IUserService, UserService>();
 builder.Services.AddTransient<IItemRepository, ItemRepository>();
 builder.Services.AddTransient<IUserRepository, UserRepository>();
 builder.Services.AddTransient<ITokenService,TokenService>();
+builder.Services.AddScoped<IPaginator,Paginator>();
 builder.Services.AddTransient<MainContext>();
 
 builder.Services.AddDbContext<MainContext>(options => {
