@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using NTierApplication.DataAccess.Utils;
 using NTierApplication.Service;
 using NTierApplication.Service.ViewModels;
@@ -19,6 +20,7 @@ namespace NTierApplication.Web.Controllers
         //fork qilishni urganyapman
         [HttpGet]
         [Route("")]
+        [Authorize]
         [SwaggerOperation(OperationId = "GetAll")]
         public ItemGetAllViewModel GetAll(int page = 1, int pageSize = 10)
         {
@@ -26,6 +28,7 @@ namespace NTierApplication.Web.Controllers
         }
 
         [HttpPost(Name = "CreateNew")]
+        [Authorize]
         public ItemViewModel CreateNew(ItemViewModel itemViewModel)
         {
             ItemService.CreateNew(itemViewModel);
@@ -33,6 +36,7 @@ namespace NTierApplication.Web.Controllers
         }
 
         [HttpGet]
+        [Authorize]
         [Route("{id}")]
         [SwaggerOperation(OperationId = "GetById")]
         public ItemViewModel GetById(long id)
@@ -41,6 +45,7 @@ namespace NTierApplication.Web.Controllers
         }
 
         [HttpPut]
+        [Authorize]
         public ItemViewModel Update(ItemViewModel itemViewModel)
         {
             ItemService.Update(itemViewModel);
@@ -48,6 +53,7 @@ namespace NTierApplication.Web.Controllers
         }
 
         [HttpDelete]
+        [Authorize]
         public void Delete(long id)
         {
             ItemService.Delete(id);

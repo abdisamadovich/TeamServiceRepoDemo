@@ -33,6 +33,7 @@ public class TokenService : ITokenService
             issuer: _config["Issuer"],
             audience: _config["Audience"],
             claims: IdentityClaims,
+            expires: TimeHelper.GetDateTime().AddHours(expiresHours),
             signingCredentials: keyCredentials
             );
 
