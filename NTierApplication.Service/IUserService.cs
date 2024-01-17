@@ -5,8 +5,8 @@ namespace NTierApplication.Service;
 
 public interface IUserService
 {
-    public (bool Result, string Token) Register(UserViewModel userViewModel);
-    public (bool Result, string Token) Login(LoginViewModel loginViewModel);
+    public bool Register(UserViewModel userViewModel);
+    public (string access_token, string refresh_token, string token_type, long expires) Login(LoginViewModel loginViewModel);
     void Update(UserViewModel user);
     void Delete(int id);
     ICollection<UserViewModel> GetUsers();
