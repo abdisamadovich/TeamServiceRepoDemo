@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Configuration;
 using NTierApplication.DataAccess.Models;
 using NTierApplication.Errors;
 using NTierApplication.Repository;
@@ -11,11 +12,13 @@ public class UserService : IUserService
 {
     private IUserRepository _repository;
     private ITokenService _tokenSerivce;
+    private readonly IConfiguration _config;
 
-    public UserService(IUserRepository userRepository, ITokenService tokenService)
+    public UserService(IUserRepository userRepository, ITokenService tokenService, IConfiguration configuration)
     {
         _repository = userRepository;
         _tokenSerivce = tokenService;
+        _config = configuration.GetSection("Jwt");
     }
 
     public void Delete(int id)
@@ -61,7 +64,7 @@ public class UserService : IUserService
         }).ToList();
     }
 
-    public (bool Result, string Token) Register(UserViewModel userViewModel)
+    public bool Register(UserViewModel userViewModel)
     {
         if (userViewModel == null)
         {
@@ -72,7 +75,7 @@ public class UserService : IUserService
             FirstOrDefault();
         if (userDatabase != null)
         {
-            throw new ParameterInvalidException("Bu email oldin ruyxatdan o'tgan.Itimos boshqa email bilan ruyxatdan o'ting!");
+            throw new ParameterInvalidException(nameof(userViewModel));
         }
 
         var passwordHash = PasswordHasher.Hasher(userViewModel.Password);
@@ -90,12 +93,11 @@ public class UserService : IUserService
 
         if (result > 0)
         {
-            string token = _tokenSerivce.GenerateToken(user);
-            return (Result: true, Token: token);
+            return true;
         }
         else
         {
-            return (Result: false, Token: "");
+            return false;
         }
     }
 
@@ -122,29 +124,30 @@ public class UserService : IUserService
         _repository.SaveChanges();
     }
 
-    (bool Result, string Token) IUserService.Login(LoginViewModel loginViewModel)
+    public (string access_token, string refresh_token, string token_type, long expires) Login(LoginViewModel loginViewModel)
     {
         if (loginViewModel == null)
         {
             throw new ArgumentNullException(nameof(loginViewModel));
         }
         var userDatabase = _repository.GetAll().
-          Where(x => x.Email == loginViewModel.Email).
+          Where(x => x.Email == loginViewModel.FirstName).
           FirstOrDefault();
         if (userDatabase == null)
         {
-            throw new EntryNotFoundException("Bu email bilan ruyxatdan o'tgan foydalanuvchi topilmadi!");
+            throw new EntryNotFoundException(nameof(userDatabase));
         }
 
         var hasherResult = PasswordHasher.Verify(loginViewModel.Password, userDatabase.Password, userDatabase.Salt);
         if (hasherResult == true)
         {
             string token = _tokenSerivce.GenerateToken(userDatabase);
-            return (Result: true, Token: token);
+            long expires_time = long.Parse(_config["Lifetime"]) * 3600;
+            return (access_token: token, refresh_token: null, token_type: "Bearer", expires: expires_time);
         }
         else
         {
-            throw new ParameterInvalidException("Bu email ga tegishli parol notug'ri kiritildi!");
+            throw new ParameterInvalidException(nameof(loginViewModel));
         }
 
     }
