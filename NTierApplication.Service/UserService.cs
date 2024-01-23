@@ -91,14 +91,7 @@ public class UserService : IUserService
         _repository.Insert(user);
         int result = _repository.SaveChanges();
 
-        if (result > 0)
-        {
-            return true;
-        }
-        else
-        {
-            return false;
-        }
+        return result > 0;
     }
 
     public void Update(UserViewModel user)
@@ -137,7 +130,7 @@ public class UserService : IUserService
         {
             throw new EntryNotFoundException(nameof(userDatabase));
         }
-
+     
         var hasherResult = PasswordHasher.Verify(loginViewModel.Password, userDatabase.Password, userDatabase.Salt);
         if (hasherResult == true)
         {
@@ -147,9 +140,8 @@ public class UserService : IUserService
         }
         else
         {
-            throw new ParameterInvalidException(nameof(loginViewModel));
+            throw new ParameterInvalidException("Invalid password");
         }
-
     }
 }
 
