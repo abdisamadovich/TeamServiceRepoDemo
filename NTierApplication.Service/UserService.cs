@@ -131,7 +131,7 @@ public class UserService : IUserService
             throw new ArgumentNullException(nameof(loginViewModel));
         }
         var userDatabase = _repository.GetAll().
-          Where(x => x.Email == loginViewModel.UserName).
+          Where(x => x.Email == loginViewModel.Email).
           FirstOrDefault();
         if (userDatabase == null)
         {
